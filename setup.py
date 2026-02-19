@@ -131,10 +131,13 @@ class LlvmliteClean(Command):
         ffi_build = os.path.join(here_dir, 'ffi', 'build')
         if os.path.exists(ffi_build):
             self._rm_tree(ffi_build)
-        self._rm_walk()
+        # restrict rm_walk here to llvmlite dir to avoid touching other
+        # subdirectories; build/ and ffi/build/ are
+        # already removed above via _rm_tree.
+        self._rm_walk(os.path.join(here_dir, 'llvmlite'))
 
-    def _rm_walk(self):
-        for path, _, files in os.walk(here_dir):
+    def _rm_walk(self, root):
+        for path, _, files in os.walk(root):
             if any(p.startswith('.') for p in path.split(os.path.sep)):
                 # Skip hidden directories like the git folder right away
                 continue
