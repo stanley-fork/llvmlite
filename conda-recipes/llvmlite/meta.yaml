@@ -13,41 +13,38 @@ build:
   number: {{ environ.get('GIT_DESCRIBE_NUMBER', 0) }}
   script_env:
     - PY_VCRUNTIME_REDIST
-    - LLVMLITE_SHARED
-    - LLVMLITE_USE_CMAKE
 
 requirements:
   build:
-    # We cannot do this on macOS as the llvm-config from the
-    # toolchain conflicts with the same from llvmdev, the
-    # build.sh deals with it!
-    - {{ compiler('c') }}    # [not (osx or armv6l or armv7l or win)]
-    - {{ compiler('cxx') }}  # [not (osx or armv6l or armv7l or win)]
-    - vs2017_{{ target_platform  }}    # [win]
-    # The DLL build uses cmake on Windows
-    - cmake          # [win]
-    - make           # [unix and not (armv6l or armv7l or aarch64)]
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - vs2022_{{ target_platform  }}    # [win]
+    - cmake
+    - make           # [unix]
   host:
     - python
+    - setuptools
     # On channel https://anaconda.org/numba/
-    - llvmdev 11.1.0 *5 # [(osx and arm64)]
-    - llvmdev 11.1.0 *4 # [not ((osx and arm64) or win)]
-    - llvmdev 11.1.0 4 # [win]
+    - llvmdev 20
     - vs2015_runtime # [win]
     # llvmdev is built with libz compression support
-    - zlib           # [unix and not (armv6l or armv7l)]
+    - zlib           # [unix]
+    # requires libxml2
+    - libxml2        # [win]
   run:
-    - python >=3.8,<3.10
+    - python >=3.10
     - vs2015_runtime # [win]
     # osx has dynamically linked libstdc++
     - libcxx >=4.0.1 # [osx]
+    - zlib
+    - zstd
 
 test:
+  requires:
+    - py-lief
   imports:
     - llvmlite
     - llvmlite.binding
-  commands:
-    - python -m llvmlite.tests
 
 about:
   home: https://github.com/numba/llvmlite

@@ -3,69 +3,88 @@ jobs:
 - template: buildscripts/azure/azure-linux-macos.yml
   parameters:
     name: macOS
-    vmImage: macos-11
+    vmImage: macos-15
+    variables:
+      MACOSX_DEPLOYMENT_TARGET: '11.0'
     matrix:
-      py38:
-        PYTHON: '3.8'
-        CONDA_ENV: cienv
-      py39:
-        PYTHON: '3.9'
-        CONDA_ENV: cienv
       py310:
         PYTHON: '3.10'
         CONDA_ENV: cienv
+      py311:
+        PYTHON: '3.11'
+        CONDA_ENV: cienv
+      py312:
+        PYTHON: '3.12'
+        CONDA_ENV: cienv
+      py313:
+        PYTHON: '3.13'
+        CONDA_ENV: cienv
+      opaque_pointers:
+        PYTHON: '3.12'
+        CONDA_ENV: cienv
+        OPAQUE_POINTERS: yes
 
 - template: buildscripts/azure/azure-linux-macos.yml
   parameters:
     name: Linux
-    vmImage: ubuntu-20.04
+    vmImage: ubuntu-24.04
     matrix:
-      py38:
-        PYTHON: '3.8'
-        CONDA_ENV: cienv
-        RUN_FLAKE8: yes
-      py39:
-        PYTHON: '3.9'
-        CONDA_ENV: cienv
-        RUN_FLAKE8: yes
       py310:
         PYTHON: '3.10'
         CONDA_ENV: cienv
         RUN_FLAKE8: yes
-        RUN_CLANG_FORMAT: yes
-# temporarily disabled
-#       pypy:
-#         PYTHON: pypy
-#         CONDA_ENV: cienv
-      py38_wheel:
-        PYTHON: '3.8'
+        DIST_TEST: yes
+      py311:
+        PYTHON: '3.11'
         CONDA_ENV: cienv
-        WHEEL: 'yes'
-      py39_wheel:
-        PYTHON: '3.9'
+        RUN_FLAKE8: yes
+        DIST_TEST: yes
+      py312:
+        PYTHON: '3.12'
         CONDA_ENV: cienv
-        WHEEL: 'yes'
+        RUN_FLAKE8: yes
+        DIST_TEST: yes
+      py313:
+        PYTHON: '3.13'
+        CONDA_ENV: cienv
+        RUN_FLAKE8: yes
+        DIST_TEST: yes
+
       py310_wheel:
         PYTHON: '3.10'
         CONDA_ENV: cienv
         WHEEL: 'yes'
-
-      py39_docs:
-        PYTHON: '3.9'
+      py311_wheel:
+        PYTHON: '3.11'
         CONDA_ENV: cienv
-        BUILD_DOCS: 'yes'
+        WHEEL: 'yes'
+      py312_wheel:
+        PYTHON: '3.12'
+        CONDA_ENV: cienv
+        WHEEL: 'yes'
+      py313_wheel:
+        PYTHON: '3.13'
+        CONDA_ENV: cienv
+        WHEEL: 'yes'
+
+      opaque_pointers:
+        PYTHON: '3.12'
+        CONDA_ENV: cienv
+        OPAQUE_POINTERS: yes
 
 - template: buildscripts/azure/azure-windows.yml
   parameters:
     name: Windows
-    vmImage: windows-2019
+    vmImage: windows-2025
 
 - job: check_formatting
   pool:
     vmImage: 'ubuntu-latest'
   steps:
   - script: |
-      set -e
-      sudo apt install -y clang-format
-      clang-format -n -Werror ffi/*.cpp ffi/*.h
+      set -ex
+      buildscripts/incremental/install_miniconda.sh
+      export PATH=$HOME/miniconda3/bin:$PATH
+      conda install -c conda-forge -y clang-format-20
+      clang-format-20 -n -Werror ffi/*.cpp ffi/*.h
     displayName: Check C++ formatting

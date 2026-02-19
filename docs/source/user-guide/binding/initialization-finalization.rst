@@ -8,7 +8,29 @@ You only need to call these functions once per process invocation.
 
 * .. function:: initialize()
 
-     Initialize the LLVM core.
+     **Deprecated.** Initialize the LLVM core.
+
+     This function is deprecated and will raise a :class:`RuntimeError` when
+     called. LLVM initialization is now handled automatically and no longer
+     requires explicit initialization calls. Remove calls to this function and
+     check for other behavioral changes that may have occurred due to LLVM
+     updates.
+
+     For code that needs to support both older and newer versions of llvmlite,
+     you can use version-conditional initialization::
+
+          import llvmlite
+          import llvmlite.binding as llvm
+
+          # Check llvmlite version to determine if initialization is needed
+          version = [int(p) for p in llvmlite.__version__.split('.')[:2]]
+
+          if version < [0, 45]:
+               # Older versions require explicit initialization
+               llvm.initialize()
+          # No initialization needed for version 0.45+
+
+     .. Code above is adapted from https://github.com/numba/llvmlite/issues/1261#issuecomment-3324513084
 
 * .. function:: initialize_all_targets()
 
@@ -51,4 +73,4 @@ You only need to call these functions once per process invocation.
 
      Since LLVM is statically linked into the ``llvmlite`` DLL,
      this is guaranteed to represent the true LLVM version in use.
-     
+

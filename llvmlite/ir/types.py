@@ -4,6 +4,7 @@ Classes that are LLVM types
 
 import struct
 
+from llvmlite import ir_layer_typed_pointers_enabled
 from llvmlite.ir._utils import _StrCaching
 
 
@@ -30,7 +31,7 @@ class Type(_StrCaching):
     def __ne__(self, other):
         return not (self == other)
 
-    def _get_ll_pointer_type(self, target_data, context=None):
+    def _get_ll_global_value_type(self, target_data, context=None):
         """
         Convert this type object to an LLVM type.
         """
@@ -43,22 +44,26 @@ class Type(_StrCaching):
             m = Module(context=context)
         foo = GlobalVariable(m, self, name="foo")
         with parse_assembly(str(m)) as llmod:
-            return llmod.get_global_variable(foo.name).type
+            return llmod.get_global_variable(foo.name).global_value_type
 
     def get_abi_size(self, target_data, context=None):
         """
         Get the ABI size of this type according to data layout *target_data*.
         """
-        llty = self._get_ll_pointer_type(target_data, context)
-        return target_data.get_pointee_abi_size(llty)
+        llty = self._get_ll_global_value_type(target_data, context)
+        return target_data.get_abi_size(llty)
+
+    def get_element_offset(self, target_data, ndx, context=None):
+        llty = self._get_ll_global_value_type(target_data, context)
+        return target_data.get_element_offset(llty, ndx)
 
     def get_abi_alignment(self, target_data, context=None):
         """
         Get the minimum ABI alignment of this type according to data layout
         *target_data*.
         """
-        llty = self._get_ll_pointer_type(target_data, context)
-        return target_data.get_pointee_abi_alignment(llty)
+        llty = self._get_ll_global_value_type(target_data, context)
+        return target_data.get_abi_alignment(llty)
 
     def format_constant(self, value):
         """
@@ -109,30 +114,76 @@ class LabelType(Type):
 class PointerType(Type):
     """
     The type of all pointer values.
+    By default (without specialisation) represents an opaque pointer.
     """
+    is_opaque = True
     is_pointer = True
     null = 'null'
 
-    def __init__(self, pointee, addrspace=0):
-        assert not isinstance(pointee, VoidType)
-        self.pointee = pointee
+    # Factory to create typed or opaque pointers based on `pointee'.
+    def __new__(cls, pointee=None, addrspace=0):
+        if cls is PointerType and pointee is not None and \
+           type(pointee) is not PointerType:
+            return super().__new__(_TypedPointerType)
+        return super(PointerType, cls).__new__(cls)
+
+    def __init__(self, pointee=None, addrspace=0):
+        assert pointee is None or type(pointee) is PointerType
         self.addrspace = addrspace
 
     def _to_string(self):
         if self.addrspace != 0:
-            return "{0} addrspace({1})*".format(self.pointee, self.addrspace)
+            return "ptr addrspace({0})".format(self.addrspace)
         else:
-            return "{0}*".format(self.pointee)
+            return "ptr"
 
     def __eq__(self, other):
-        if isinstance(other, PointerType):
-            return (self.pointee, self.addrspace) == (other.pointee,
-                                                      other.addrspace)
-        else:
-            return False
+        return (isinstance(other, PointerType) and
+                self.addrspace == other.addrspace)
 
     def __hash__(self):
         return hash(PointerType)
+
+    @property
+    def intrinsic_name(self):
+        return 'p%d' % self.addrspace
+
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        return cls()
+
+
+class _TypedPointerType(PointerType):
+    """
+    The type of typed pointer values. To be removed eventually.
+    """
+
+    def __init__(self, pointee, addrspace=0):
+        super(_TypedPointerType, self).__init__(None, addrspace)
+        assert pointee is not None and type(pointee) is not PointerType
+        assert not isinstance(pointee, VoidType)
+        self.pointee = pointee
+        self.is_opaque = False
+
+    def _to_string(self):
+        if ir_layer_typed_pointers_enabled:
+            return "{0}*".format(self.pointee) if self.addrspace == 0 else \
+                   "{0} addrspace({1})*".format(self.pointee, self.addrspace)
+        return super(_TypedPointerType, self)._to_string()
+
+    # This implements ``isOpaqueOrPointeeTypeEquals''.
+    def __eq__(self, other):
+        if isinstance(other, _TypedPointerType):
+            return (self.pointee, self.addrspace) == (other.pointee,
+                                                      other.addrspace)
+        return (isinstance(other, PointerType) and
+                self.addrspace == other.addrspace)
+
+    def __hash__(self):
+        return hash(_TypedPointerType)
 
     def gep(self, i):
         """
@@ -144,7 +195,9 @@ class PointerType(Type):
 
     @property
     def intrinsic_name(self):
-        return 'p%d%s' % (self.addrspace, self.pointee.intrinsic_name)
+        if ir_layer_typed_pointers_enabled:
+            return 'p%d%s' % (self.addrspace, self.pointee.intrinsic_name)
+        return super(_TypedPointerType, self).intrinsic_name
 
 
 class VoidType(Type):
@@ -160,6 +213,13 @@ class VoidType(Type):
 
     def __hash__(self):
         return hash(VoidType)
+
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        return cls()
 
 
 class FunctionType(Type):
@@ -194,6 +254,17 @@ class FunctionType(Type):
     def __hash__(self):
         return hash(FunctionType)
 
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        params = tuple(x.as_ir(ir_ctx=ir_ctx)
+                       for x in typeref.get_function_parameters())
+        ret = typeref.get_function_return().as_ir(ir_ctx=ir_ctx)
+        is_vararg = typeref.is_function_vararg
+        return cls(ret, params, is_vararg)
+
 
 class IntType(Type):
     """
@@ -201,6 +272,7 @@ class IntType(Type):
     """
     null = '0'
     _instance_cache = {}
+    width: int
 
     def __new__(cls, bits):
         # Cache all common integer types
@@ -252,6 +324,13 @@ class IntType(Type):
     def intrinsic_name(self):
         return str(self)
 
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        return IntType(typeref.type_width)
+
 
 def _as_float(value):
     """
@@ -300,6 +379,13 @@ class _BaseFloatType(Type):
     @classmethod
     def _create_instance(cls):
         cls._instance_cache = super(_BaseFloatType, cls).__new__(cls)
+
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        return cls()
 
 
 class HalfType(_BaseFloatType):
@@ -413,6 +499,16 @@ class VectorType(Type):
         return [Constant(ty, val) if not isinstance(val, Value) else val
                 for ty, val in zip(self.elements, values)]
 
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        [elemtyperef] = typeref.elements
+        elemty = elemtyperef.as_ir(ir_ctx=ir_ctx)
+        count = typeref.element_count
+        return cls(elemty, count)
+
 
 class Aggregate(Type):
     """
@@ -470,6 +566,16 @@ class ArrayType(Aggregate):
         itemstring = ", " .join(["{0} {1}".format(x.type, x.get_reference())
                                  for x in value])
         return "[{0}]".format(itemstring)
+
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        [elemtyperef] = typeref.elements
+        elemty = elemtyperef.as_ir(ir_ctx=ir_ctx)
+        count = typeref.element_count
+        return cls(elemty, count)
 
 
 class BaseStructType(Aggregate):
@@ -535,6 +641,17 @@ class BaseStructType(Aggregate):
         else:
             return textrepr
 
+    @classmethod
+    def from_llvm(cls, typeref, ir_ctx):
+        """
+        Create from a llvmlite.binding.TypeRef
+        """
+        if typeref.is_literal_struct:
+            elems = [el.as_ir(ir_ctx=ir_ctx) for el in typeref.elements]
+            return cls(elems, typeref.is_packed_struct)
+        else:
+            return ir_ctx.get_identified_type(typeref.name)
+
 
 class LiteralStructType(BaseStructType):
     """
@@ -557,7 +674,8 @@ class LiteralStructType(BaseStructType):
 
     def __eq__(self, other):
         if isinstance(other, LiteralStructType):
-            return self.elements == other.elements
+            return (self.elements == other.elements
+                    and self.packed == other.packed)
 
     def __hash__(self):
         return hash(LiteralStructType)
@@ -601,7 +719,8 @@ class IdentifiedStructType(BaseStructType):
 
     def __eq__(self, other):
         if isinstance(other, IdentifiedStructType):
-            return self.name == other.name
+            return (self.name == other.name
+                    and self.packed == other.packed)
 
     def __hash__(self):
         return hash(IdentifiedStructType)

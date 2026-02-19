@@ -1,8 +1,15 @@
-# Conda environment configuration for readthedocs
-
-name: rtdenv
+name: rtd
+channels:
+  - numba/label/dev
 dependencies:
-  - python=3.9
-  - sphinx
-  # https://stackoverflow.com/questions/67542699/readthedocs-sphinx-not-rendering-bullet-list-from-rst-fileA
+  - python
+  # pip for installing llvmlite itself
+  - pip
+  - llvmdev=20
+  - cmake
+  - make
   - docutils==0.16
+  - gcc_linux-64=11
+  - gxx_linux-64=11
+  - sphinx_rtd_theme
+

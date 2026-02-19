@@ -5,9 +5,6 @@ llvmlite
 .. image:: https://dev.azure.com/numba/numba/_apis/build/status/numba.llvmlite?branchName=main
    :target: https://dev.azure.com/numba/numba/_build/latest?definitionId=2&branchName=main
    :alt: Azure Pipelines
-.. image:: https://codeclimate.com/github/numba/llvmlite/badges/gpa.svg
-   :target: https://codeclimate.com/github/numba/llvmlite
-   :alt: Code Climate
 .. image:: https://coveralls.io/repos/github/numba/llvmlite/badge.svg
    :target: https://coveralls.io/github/numba/llvmlite
    :alt: Coveralls.io
@@ -51,22 +48,27 @@ Key Benefits
   ctypes (no need to wrestle with Python's compiler requirements and C++ 11
   compatibility).
 * The Python binding layer has sane memory management.
-* llvmlite is quite faster than llvmpy's thanks to a much simpler architeture
+* llvmlite is faster than llvmpy thanks to a much simpler architecture
   (the Numba_ test suite is twice faster than it was).
 
 Compatibility
 =============
 
-llvmlite works with Python 3.8 and greater.
+llvmlite has been tested with Python 3.10 -- 3.13 and is likely to work with
+greater versions.
 
-As of version 0.37.0, llvmlite requires LLVM 11.x.x on all architectures
+As of version 0.45.0, llvmlite requires LLVM 20.x.x on all architectures
 
 Historical compatibility table:
 
 =================  ========================
 llvmlite versions  compatible LLVM versions
 =================  ========================
-0.37.0 - ...       11.x.x
+0.45.0 - ......    20.x.x
+0.44.0             15.x.x and 16.x.x
+0.41.0 - 0.43.0    14.x.x
+0.40.0 - 0.40.1    11.x.x and 14.x.x (12.x.x and 13.x.x untested but may work)
+0.37.0 - 0.39.1    11.x.x
 0.34.0 - 0.36.0    10.0.x (9.0.x for  ``aarch64`` only)
 0.33.0             9.0.x
 0.29.0 - 0.32.0    7.0.x, 7.1.x, 8.0.x

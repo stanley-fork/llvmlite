@@ -6,7 +6,7 @@ parameters:
 
 jobs:
 - job: ${{ parameters.name }}
-  pool: 
+  pool:
     vmImage: ${{ parameters.vmImage }}
   strategy:
     maxParallel: 11
@@ -42,24 +42,5 @@ jobs:
     - script: |
         set -e
         export PATH=$HOME/miniconda3/bin:$PATH
-        conda install -y sphinx sphinx_rtd_theme pygments
-        echo "Building docs"
-        cd docs
-        make SPHINXOPTS=-Wn clean html
-        cd ..
-      displayName: 'Build Docs'
-      condition: eq(variables['BUILD_DOCS'], 'yes')
-
-    - script: |
-        set -e
-        export PATH=$HOME/miniconda3/bin:$PATH
         buildscripts/incremental/test.sh
       displayName: 'Test'
-# This is last because we need to install a bunch of LLVM stuff that will pollute the build environment
-    - script: |
-         set -e
-         export PATH=$HOME/miniconda3/bin:$PATH
-         conda install -c conda-forge -y clang-format-13
-         clang-format-13 -n -Werror ffi/*.cpp ffi/*.h
-      displayName: Check C++ formatting
-      condition: eq(variables['RUN_CLANG_FORMAT'], 'yes')

@@ -11,11 +11,7 @@ source deactivate
 set -v
 # Display root environment (for debugging)
 conda list
-# Clean up any left-over from a previous build
-# (note workaround for https://github.com/conda/conda/issues/2679:
-#  `conda env remove` issue)
-conda remove --all -q -y -n $CONDA_ENV
-# Scipy, CFFI, jinja2 and IPython are optional dependencies, but exercised in the test suite
+
 if [ "$PYTHON" == "pypy" ]; then
     conda create -c gmarkall -n $CONDA_ENV -q -y pypy
 else
@@ -26,13 +22,12 @@ set +v
 source activate $CONDA_ENV
 set -v
 
-# Install llvmdev (separate channel, for now)
-$CONDA_INSTALL -c numba llvmdev="11.*"
-
-# Install the compiler toolchain, for osx, bootstrapping needed
-# which happens in build.sh
-if [[ $(uname) == Linux ]]; then
-$CONDA_INSTALL gcc_linux-64 gxx_linux-64
+# Install llvmdev 20 and compiler toolchain for linux
+# 
+if [[ "$(uname)" == "Linux" ]]; then
+    $CONDA_INSTALL numba/label/dev::llvmdev=20 gcc_linux-64=11 gxx_linux-64=11
+else
+    $CONDA_INSTALL numba/label/dev::llvmdev=20
 fi
 
 # Install dependencies for code coverage (codecov.io)

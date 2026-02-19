@@ -52,8 +52,8 @@ class Instruction(NamedValue, _HasMetadata):
 
 
 class CallInstrAttributes(AttributeSet):
-    _known = frozenset(['noreturn', 'nounwind', 'readonly', 'readnone',
-                        'noinline', 'alwaysinline'])
+    _known = frozenset(['convergent', 'noreturn', 'nounwind', 'readonly',
+                        'readnone', 'noinline', 'alwaysinline'])
 
 
 TailMarkerOptions = frozenset(['tail', 'musttail', 'notail'])
@@ -133,7 +133,7 @@ class CallInstr(Instruction):
     def _descr(self, buf, add_metadata):
         def descr_arg(i, a):
             if i in self.arg_attributes:
-                attrs = ' '.join(self.arg_attributes[i]._to_list()) + ' '
+                attrs = ' '.join(self.arg_attributes[i]._to_list(a.type)) + ' '
             else:
                 attrs = ''
             return '{0} {1}{2}'.format(a.type, attrs, a.get_reference())
@@ -155,13 +155,19 @@ class CallInstr(Instruction):
         if self.tail:
             tail_marker = "{0} ".format(self.tail)
 
+        fn_attrs = ' ' + ' '.join(self.attributes._to_list(fnty.return_type))\
+            if self.attributes else ''
+
+        fm_attrs = ' ' + ' '.join(self.fastmath._to_list(fnty.return_type))\
+            if self.fastmath else ''
+
         buf.append("{tail}{op}{fastmath} {callee}({args}){attr}{meta}\n".format(
             tail=tail_marker,
             op=self.opname,
             callee=callee_ref,
-            fastmath=''.join([" " + attr for attr in self.fastmath]),
+            fastmath=fm_attrs,
             args=args,
-            attr=''.join([" " + attr for attr in self.attributes]),
+            attr=fn_attrs,
             meta=(self._stringify_metadata(leading_comma=True)
                   if add_metadata else ""),
         ))
@@ -425,9 +431,17 @@ class CastInstr(Instruction):
 
 class LoadInstr(Instruction):
 
-    def __init__(self, parent, ptr, name=''):
-        super(LoadInstr, self).__init__(parent, ptr.type.pointee, "load",
-                                        [ptr], name=name)
+    def __init__(self, parent, ptr, name='', typ=None):
+        if typ is None:
+            if isinstance(ptr, AllocaInstr):
+                typ = ptr.allocated_type
+            # For compatibility with typed pointers. Eventually this should
+            # probably be removed (when typed pointers are fully removed).
+            elif not ptr.type.is_opaque:
+                typ = ptr.type.pointee
+            else:
+                raise ValueError("Load lacks type.")
+        super(LoadInstr, self).__init__(parent, typ, "load", [ptr], name=name)
         self.align = None
 
     def descr(self, buf):
@@ -437,7 +451,7 @@ class LoadInstr(Instruction):
         else:
             align = ''
         buf.append("load {0}, {1} {2}{3}{4}\n".format(
-            val.type.pointee,
+            self.type,
             val.type,
             val.get_reference(),
             align,
@@ -467,16 +481,25 @@ class StoreInstr(Instruction):
 
 
 class LoadAtomicInstr(Instruction):
-    def __init__(self, parent, ptr, ordering, align, name=''):
-        super(LoadAtomicInstr, self).__init__(parent, ptr.type.pointee,
-                                              "load atomic", [ptr], name=name)
+    def __init__(self, parent, ptr, ordering, align, name='', typ=None):
+        if typ is None:
+            if isinstance(ptr, AllocaInstr):
+                typ = ptr.allocated_type
+            # For compatibility with typed pointers. Eventually this should
+            # probably be removed (when typed pointers are fully removed).
+            elif not ptr.type.is_opaque:
+                typ = ptr.type.pointee
+            else:
+                raise ValueError("Load atomic lacks type.")
+        super(LoadAtomicInstr, self).__init__(parent, typ, "load atomic",
+                                              [ptr], name=name)
         self.ordering = ordering
         self.align = align
 
     def descr(self, buf):
         [val] = self.operands
         buf.append("load atomic {0}, {1} {2} {3}, align {4}{5}\n".format(
-            val.type.pointee,
+            self.type,
             val.type,
             val.get_reference(),
             self.ordering,
@@ -510,10 +533,11 @@ class AllocaInstr(Instruction):
         operands = [count] if count else ()
         super(AllocaInstr, self).__init__(parent, typ.as_pointer(), "alloca",
                                           operands, name)
+        self.allocated_type = typ
         self.align = None
 
     def descr(self, buf):
-        buf.append("{0} {1}".format(self.opname, self.type.pointee))
+        buf.append("{0} {1}".format(self.opname, self.allocated_type))
         if self.operands:
             op, = self.operands
             buf.append(", {0} {1}".format(op.type, op.get_reference()))
@@ -524,22 +548,31 @@ class AllocaInstr(Instruction):
 
 
 class GEPInstr(Instruction):
-    def __init__(self, parent, ptr, indices, inbounds, name):
-        typ = ptr.type
-        lasttyp = None
-        lastaddrspace = 0
-        for i in indices:
-            lasttyp, typ = typ, typ.gep(i)
-            # inherit the addrspace from the last seen pointer
-            if isinstance(lasttyp, types.PointerType):
-                lastaddrspace = lasttyp.addrspace
+    def __init__(self, parent, ptr, indices, inbounds, name,
+                 source_etype=None):
+        if source_etype is not None:
+            typ = ptr.type
+            self.source_etype = source_etype
+        # For compatibility with typed pointers. Eventually this should
+        # probably be removed (when typed pointers are fully removed).
+        elif not ptr.type.is_opaque:
+            typ = ptr.type
+            lasttyp = None
+            lastaddrspace = 0
+            for i in indices:
+                lasttyp, typ = typ, typ.gep(i)
+                # inherit the addrspace from the last seen pointer
+                if isinstance(lasttyp, types.PointerType):
+                    lastaddrspace = lasttyp.addrspace
 
-        if (not isinstance(typ, types.PointerType) and
-                isinstance(lasttyp, types.PointerType)):
-            typ = lasttyp
+            if (not isinstance(typ, types.PointerType) and
+                    isinstance(lasttyp, types.PointerType)):
+                typ = lasttyp
+            else:
+                typ = typ.as_pointer(lastaddrspace)
+            self.source_etype = ptr.type.pointee
         else:
-            typ = typ.as_pointer(lastaddrspace)
-
+            raise ValueError("GEP lacks type.")
         super(GEPInstr, self).__init__(parent, typ, "getelementptr",
                                        [ptr] + list(indices), name=name)
         self.pointer = ptr
@@ -552,7 +585,7 @@ class GEPInstr(Instruction):
         op = "getelementptr inbounds" if self.inbounds else "getelementptr"
         buf.append("{0} {1}, {2} {3}, {4} {5}\n".format(
                    op,
-                   self.pointer.type.pointee,
+                   self.source_etype,
                    self.pointer.type,
                    self.pointer.get_reference(),
                    ', '.join(indices),
@@ -732,7 +765,7 @@ class InlineAsm(object):
 
     def descr(self, buf):
         sideeffect = 'sideeffect' if self.side_effect else ''
-        fmt = 'asm {sideeffect} "{asm}", "{constraint}"\n'
+        fmt = 'asm {sideeffect} "{asm}", "{constraint}"'
         buf.append(fmt.format(sideeffect=sideeffect, asm=self.asm,
                               constraint=self.constraint))
 
@@ -870,3 +903,18 @@ class Fence(Instruction):
         buf.append(fmt.format(syncscope=syncscope,
                               ordering=self.ordering,
                               ))
+
+
+class Comment(Instruction):
+    """
+    A line comment.
+    """
+
+    def __init__(self, parent, text):
+        super(Comment, self).__init__(parent, types.VoidType(), ";", (),
+                                      name='')
+        assert "\n" not in text, "Comment cannot contain new line"
+        self.text = text
+
+    def descr(self, buf):
+        buf.append(f"; {self.text}")

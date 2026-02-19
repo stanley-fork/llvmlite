@@ -1,3 +1,462 @@
+v0.46.0 (December 8, 2025)
+--------------------------
+
+Highlights of this release include:
+
+- Official support for Python 3.14.
+- CMake IPO (Interprocedural Optimization) support.
+- Fix for LLVM symbol visibility to prevent unwanted symbol export.
+- Support for typed constants in debug info metadata.
+- Improved error handling for FFI binding errors and missing CMake.
+- Documentation for migrating from older llvmlite versions (<0.45).
+
+Pull-Requests:
+
+* PR `#1309 <https://github.com/numba/llvmlite/pull/1309>`_: Add docs for migrating from older llvmlite (<0.45) (`sklam <https://github.com/sklam>`_ `esc <https://github.com/esc>`_)
+* PR `#1311 <https://github.com/numba/llvmlite/pull/1311>`_: GHA/ cleanup on python 3.14 official support (`swap357 <https://github.com/swap357>`_)
+* PR `#1313 <https://github.com/numba/llvmlite/pull/1313>`_: Merge pull request #1310 from esc/change-log-0.45.1 (`esc <https://github.com/esc>`_)
+* PR `#1314 <https://github.com/numba/llvmlite/pull/1314>`_: [FIX] Hide non-API symbols when CXX compiler supports GNUC style visibility controls to prevent LLVM symbol export and interposition (`domcharrier <https://github.com/domcharrier>`_)
+* PR `#1316 <https://github.com/numba/llvmlite/pull/1316>`_: Prevent creating typed pointers of opaque pointers. (`rj-jesus <https://github.com/rj-jesus>`_)
+* PR `#1317 <https://github.com/numba/llvmlite/pull/1317>`_: Correct debug message text (`eric-wieser <https://github.com/eric-wieser>`_)
+* PR `#1320 <https://github.com/numba/llvmlite/pull/1320>`_: chore(deps): update dependency python to 3.14 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1321 <https://github.com/numba/llvmlite/pull/1321>`_: Fix OptimizationLevel mapping for Os (`yashssh <https://github.com/yashssh>`_)
+* PR `#1322 <https://github.com/numba/llvmlite/pull/1322>`_: update release checklists (`esc <https://github.com/esc>`_)
+* PR `#1323 <https://github.com/numba/llvmlite/pull/1323>`_: Consolidate conda installs on azure environment setup script (`swap357 <https://github.com/swap357>`_)
+* PR `#1325 <https://github.com/numba/llvmlite/pull/1325>`_: fix `llvmdev_for_wheel` linux builds (`swap357 <https://github.com/swap357>`_)
+* PR `#1326 <https://github.com/numba/llvmlite/pull/1326>`_: [FEA] Add support for typed constant in debug info metadata emission. (`jiel-nv <https://github.com/jiel-nv>`_)
+* PR `#1327 <https://github.com/numba/llvmlite/pull/1327>`_: Update pre-commit hook rhysd/actionlint to v1.7.8 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1329 <https://github.com/numba/llvmlite/pull/1329>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.34.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1332 <https://github.com/numba/llvmlite/pull/1332>`_: GHA/ fix llvmlite `osx-arm64` wheel build tag (`swap357 <https://github.com/swap357>`_)
+* PR `#1333 <https://github.com/numba/llvmlite/pull/1333>`_: InlineAsm: fix formatting (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1334 <https://github.com/numba/llvmlite/pull/1334>`_: CMake IPO support. (`stuartarchibald <https://github.com/stuartarchibald>`_ `tiran <https://github.com/tiran>`_)
+* PR `#1335 <https://github.com/numba/llvmlite/pull/1335>`_: Fix use of deprecated LLVM API. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1336 <https://github.com/numba/llvmlite/pull/1336>`_: Fix dummy CMake project. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1339 <https://github.com/numba/llvmlite/pull/1339>`_: chore(deps): update github artifact actions (major) (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1340 <https://github.com/numba/llvmlite/pull/1340>`_: fix syntax in docs (`esc <https://github.com/esc>`_)
+* PR `#1341 <https://github.com/numba/llvmlite/pull/1341>`_: fix/ remove 'conda-remove-defaults' option from `setup-miniconda` (`swap357 <https://github.com/swap357>`_)
+* PR `#1345 <https://github.com/numba/llvmlite/pull/1345>`_: gha/add upload_packages workflow (`swap357 <https://github.com/swap357>`_)
+* PR `#1346 <https://github.com/numba/llvmlite/pull/1346>`_: gha/ pin `miniconda` installers for manylinux builds (`swap357 <https://github.com/swap357>`_)
+* PR `#1350 <https://github.com/numba/llvmlite/pull/1350>`_: update license metadata (`esc <https://github.com/esc>`_)
+* PR `#1353 <https://github.com/numba/llvmlite/pull/1353>`_: chore(deps): update pre-commit hook pre-commit/mirrors-clang-format to v21.1.5 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1354 <https://github.com/numba/llvmlite/pull/1354>`_: Improve error handling on FFI binding error (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1355 <https://github.com/numba/llvmlite/pull/1355>`_: Improve error handling when CMake is not found. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1358 <https://github.com/numba/llvmlite/pull/1358>`_: Pin gcc/gxx to 11 (`sklam <https://github.com/sklam>`_)
+* PR `#1359 <https://github.com/numba/llvmlite/pull/1359>`_: update macos image version from `macos-13` to `macos-15` on azure ci (`swap357 <https://github.com/swap357>`_)
+* PR `#1360 <https://github.com/numba/llvmlite/pull/1360>`_: chore(deps): update pre-commit hook python-jsonschema/check-jsonschema to v0.35.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1376 <https://github.com/numba/llvmlite/pull/1376>`_: update changelog for 0.46.0 (`swap357 <https://github.com/swap357>`_)
+
+Authors:
+
+* `domcharrier <https://github.com/domcharrier>`_
+* `eric-wieser <https://github.com/eric-wieser>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `jiel-nv <https://github.com/jiel-nv>`_
+* `renovate[bot] <https://github.com/apps/renovate>`_
+* `rj-jesus <https://github.com/rj-jesus>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+* `swap357 <https://github.com/swap357>`_
+* `tiran <https://github.com/tiran>`_
+* `yashssh <https://github.com/yashssh>`_
+
+v0.45.1 (October 01, 2025)
+--------------------------
+
+The is a patch release to fix an issue with `Windows wheels <https://github.com/numba/llvmlite/issues/1297>`_.
+
+Pull-Requests:
+
+* PR `#1307 <https://github.com/numba/llvmlite/pull/1307>`_: GHA/win-64 add delvewheel repair to bundle ``msvcp140.dll`` (`swap357 <https://github.com/swap357>`_)
+* PR `#1310 <https://github.com/numba/llvmlite/pull/1310>`_: Change-log 0.45.1 (`esc <https://github.com/esc>`_)
+
+Authors:
+
+* `esc <https://github.com/esc>`_
+* `swap357 <https://github.com/swap357>`_
+
+v0.45.0 (Sept 17, 2025)
+-----------------------
+
+This release of llvmlite introduces support for LLVM 20. For more information
+about the state of the support and breaking changes, please see: https://llvmlite.readthedocs.io/en/latest/user-guide/llvm20.html
+
+Pull-Requests:
+
+* PR `#1091 <https://github.com/numba/llvmlite/pull/1091>`_: [NPM] Add hooks for llvm passes in llvmlite (`gmarkall <https://github.com/gmarkall>`_ `yashssh <https://github.com/yashssh>`_)
+* PR `#1092 <https://github.com/numba/llvmlite/pull/1092>`_: Move llvmlite to LLVM 20 (`sklam <https://github.com/sklam>`_ `swap357 <https://github.com/swap357>`_ `yashssh <https://github.com/yashssh>`_ `esc <https://github.com/esc>`_)
+* PR `#1096 <https://github.com/numba/llvmlite/pull/1096>`_: Added changelog for 0.44.0rc1 (`kc611 <https://github.com/kc611>`_)
+* PR `#1101 <https://github.com/numba/llvmlite/pull/1101>`_: Updated date and llvm versioning for 0.44.0rc1 (`kc611 <https://github.com/kc611>`_)
+* PR `#1112 <https://github.com/numba/llvmlite/pull/1112>`_: adding bullet to first RC checklist regarding LLVM updates (`esc <https://github.com/esc>`_)
+* PR `#1113 <https://github.com/numba/llvmlite/pull/1113>`_: Merge pull request #1104 from sklam/misc/osx_wheel_fix (`kc611 <https://github.com/kc611>`_ `esc <https://github.com/esc>`_)
+* PR `#1114 <https://github.com/numba/llvmlite/pull/1114>`_: Merge pull request #1108 from sklam/fix/win_wheel (`kc611 <https://github.com/kc611>`_ `esc <https://github.com/esc>`_)
+* PR `#1115 <https://github.com/numba/llvmlite/pull/1115>`_: Update changelog for v0.44.0rc2 (`kc611 <https://github.com/kc611>`_)
+* PR `#1124 <https://github.com/numba/llvmlite/pull/1124>`_: Changed version number and release date (`kc611 <https://github.com/kc611>`_)
+* PR `#1125 <https://github.com/numba/llvmlite/pull/1125>`_: Fix flag condition when creating SimpleLoopUnswitchLegacyPass (`HighW4y2H3ll <https://github.com/HighW4y2H3ll>`_)
+* PR `#1128 <https://github.com/numba/llvmlite/pull/1128>`_: Adding llvmdev win 64 conda builder (`esc <https://github.com/esc>`_)
+* PR `#1129 <https://github.com/numba/llvmlite/pull/1129>`_: llvmlite win-64 conda builder GHA (`esc <https://github.com/esc>`_)
+* PR `#1130 <https://github.com/numba/llvmlite/pull/1130>`_: Configure Renovate (`renovate[bot] <https://github.com/apps/renovate>`_ `esc <https://github.com/esc>`_)
+* PR `#1131 <https://github.com/numba/llvmlite/pull/1131>`_: llvmdev_linux-64_conda_builder.yml (`esc <https://github.com/esc>`_)
+* PR `#1132 <https://github.com/numba/llvmlite/pull/1132>`_: llvmlite_linux-64_conda_builder.yml (`esc <https://github.com/esc>`_)
+* PR `#1133 <https://github.com/numba/llvmlite/pull/1133>`_: Cherry-pick changes to the `CHANGE_LOG` to `main` (`kc611 <https://github.com/kc611>`_)
+* PR `#1139 <https://github.com/numba/llvmlite/pull/1139>`_: Add win-64 wheel builder GHA workflow (`dbast <https://github.com/dbast>`_ `swap357 <https://github.com/swap357>`_ `esc <https://github.com/esc>`_)
+* PR `#1141 <https://github.com/numba/llvmlite/pull/1141>`_: refactor llvmdev win builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1142 <https://github.com/numba/llvmlite/pull/1142>`_: point conda build to correct package path (`esc <https://github.com/esc>`_)
+* PR `#1143 <https://github.com/numba/llvmlite/pull/1143>`_: remove release.yml -- it's stale and outdated (`esc <https://github.com/esc>`_)
+* PR `#1144 <https://github.com/numba/llvmlite/pull/1144>`_: Refactor recipe build flows (`dbast <https://github.com/dbast>`_)
+* PR `#1146 <https://github.com/numba/llvmlite/pull/1146>`_: Extend pre-commit config (`dbast <https://github.com/dbast>`_)
+* PR `#1148 <https://github.com/numba/llvmlite/pull/1148>`_: Update pre-commit hook pre-commit/mirrors-clang-format to v19 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1149 <https://github.com/numba/llvmlite/pull/1149>`_: Rename llvmdev manylinux (`esc <https://github.com/esc>`_)
+* PR `#1150 <https://github.com/numba/llvmlite/pull/1150>`_: enable running workflow as part of pull-request (`esc <https://github.com/esc>`_)
+* PR `#1151 <https://github.com/numba/llvmlite/pull/1151>`_: fix flake8 issues (`esc <https://github.com/esc>`_)
+* PR `#1152 <https://github.com/numba/llvmlite/pull/1152>`_: adding pre-commit workflow (`esc <https://github.com/esc>`_)
+* PR `#1154 <https://github.com/numba/llvmlite/pull/1154>`_: execute dist tests for linux-64 conda pkgs via Azure (`esc <https://github.com/esc>`_)
+* PR `#1156 <https://github.com/numba/llvmlite/pull/1156>`_: Enable Github Action pinning via renovate (`dbast <https://github.com/dbast>`_)
+* PR `#1157 <https://github.com/numba/llvmlite/pull/1157>`_: Update pre-commit hook PyCQA/flake8 to v7.1.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1158 <https://github.com/numba/llvmlite/pull/1158>`_: Opaque pointer fixes (`rj-jesus <https://github.com/rj-jesus>`_ `gmarkall <https://github.com/gmarkall>`_)
+* PR `#1159 <https://github.com/numba/llvmlite/pull/1159>`_: Add IR layer typed pointers mode (`rj-jesus <https://github.com/rj-jesus>`_ `gmarkall <https://github.com/gmarkall>`_)
+* PR `#1160 <https://github.com/numba/llvmlite/pull/1160>`_: Drop binding layer typed pointer support. (`rj-jesus <https://github.com/rj-jesus>`_)
+* PR `#1161 <https://github.com/numba/llvmlite/pull/1161>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.31.3 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1163 <https://github.com/numba/llvmlite/pull/1163>`_: Enable pass timings reporting with NewPassManager (`gmarkall <https://github.com/gmarkall>`_ `yashssh <https://github.com/yashssh>`_)
+* PR `#1165 <https://github.com/numba/llvmlite/pull/1165>`_: Fix the metadata deduplication (`jiel-nv <https://github.com/jiel-nv>`_)
+* PR `#1169 <https://github.com/numba/llvmlite/pull/1169>`_: Update pre-commit hook pre-commit/mirrors-clang-format to v20 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1171 <https://github.com/numba/llvmlite/pull/1171>`_: Pin dependencies (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1172 <https://github.com/numba/llvmlite/pull/1172>`_: Update actions/checkout action to v4.2.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1173 <https://github.com/numba/llvmlite/pull/1173>`_: Update actions/download-artifact action to v4.1.9 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1174 <https://github.com/numba/llvmlite/pull/1174>`_: Update actions/setup-python action to v5.4.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1175 <https://github.com/numba/llvmlite/pull/1175>`_: Update actions/upload-artifact action to v4.6.2  (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1176 <https://github.com/numba/llvmlite/pull/1176>`_: Update conda-incubator/setup-miniconda action to v3.1.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1177 <https://github.com/numba/llvmlite/pull/1177>`_: fix typo in workflow options for llvmdev_build.yml (`swap357 <https://github.com/swap357>`_)
+* PR `#1178 <https://github.com/numba/llvmlite/pull/1178>`_: Update actions/download-artifact action to v4.2.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1180 <https://github.com/numba/llvmlite/pull/1180>`_: Update actions/setup-python action to v5.5.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1181 <https://github.com/numba/llvmlite/pull/1181>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.32.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1185 <https://github.com/numba/llvmlite/pull/1185>`_: Update pre-commit hook PyCQA/flake8 to v7.2.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1187 <https://github.com/numba/llvmlite/pull/1187>`_: gha/add llvmlite osx 64 wheel builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1188 <https://github.com/numba/llvmlite/pull/1188>`_: bump min CMake (`esc <https://github.com/esc>`_)
+* PR `#1189 <https://github.com/numba/llvmlite/pull/1189>`_: bump Ubuntu to 24.04 (`esc <https://github.com/esc>`_)
+* PR `#1190 <https://github.com/numba/llvmlite/pull/1190>`_: gha/add llvmlite osx 64 conda builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1193 <https://github.com/numba/llvmlite/pull/1193>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.33.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1195 <https://github.com/numba/llvmlite/pull/1195>`_: gha/add llvmlite osx-arm64 conda builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1196 <https://github.com/numba/llvmlite/pull/1196>`_: Pin dependencies (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1197 <https://github.com/numba/llvmlite/pull/1197>`_: Update actions/checkout action to v4.2.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1198 <https://github.com/numba/llvmlite/pull/1198>`_: Update actions/download-artifact action to v4.3.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1199 <https://github.com/numba/llvmlite/pull/1199>`_: Update actions/setup-python action to v5.6.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1200 <https://github.com/numba/llvmlite/pull/1200>`_: Update actions/upload-artifact action to v4.6.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1201 <https://github.com/numba/llvmlite/pull/1201>`_: Update conda-incubator/setup-miniconda action to v3.1.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1203 <https://github.com/numba/llvmlite/pull/1203>`_: gha/add llvmlite osx-arm64 wheel builder workflow (`swap357 <https://github.com/swap357>`_)
+* PR `#1205 <https://github.com/numba/llvmlite/pull/1205>`_: gha/add llvmlite_linux-64 wheel builder workflow (`swap357 <https://github.com/swap357>`_)
+* PR `#1206 <https://github.com/numba/llvmlite/pull/1206>`_: gha/add llvmlite linux-arm64 wheel builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1209 <https://github.com/numba/llvmlite/pull/1209>`_: remove singular clang-format check based on ubuntu/apt (`esc <https://github.com/esc>`_)
+* PR `#1210 <https://github.com/numba/llvmlite/pull/1210>`_: Update pre-commit hook pre-commit/mirrors-clang-format to v20.1.4 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1211 <https://github.com/numba/llvmlite/pull/1211>`_: gha/fix llvmlite linux workflows for version tags (`swap357 <https://github.com/swap357>`_)
+* PR `#1213 <https://github.com/numba/llvmlite/pull/1213>`_: unify clang format check (`esc <https://github.com/esc>`_)
+* PR `#1215 <https://github.com/numba/llvmlite/pull/1215>`_: gha/add llvmlite linux-arm64 conda builder (`swap357 <https://github.com/swap357>`_)
+* PR `#1216 <https://github.com/numba/llvmlite/pull/1216>`_: gha/refactor llvmlite osx wheel workflows (`swap357 <https://github.com/swap357>`_)
+* PR `#1217 <https://github.com/numba/llvmlite/pull/1217>`_: gha/refactor llvmlite win-64 workflows (`swap357 <https://github.com/swap357>`_)
+* PR `#1218 <https://github.com/numba/llvmlite/pull/1218>`_: Pin conda-incubator/setup-miniconda action to 505e639 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1219 <https://github.com/numba/llvmlite/pull/1219>`_: Update actions/checkout action to v4.2.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1220 <https://github.com/numba/llvmlite/pull/1220>`_: Update actions/download-artifact action to v4.3.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1221 <https://github.com/numba/llvmlite/pull/1221>`_: Update actions/upload-artifact action to v4.6.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1222 <https://github.com/numba/llvmlite/pull/1222>`_: Update conda-incubator/setup-miniconda action to v3.1.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1223 <https://github.com/numba/llvmlite/pull/1223>`_: fix/revert gha recipe changes (`swap357 <https://github.com/swap357>`_)
+* PR `#1224 <https://github.com/numba/llvmlite/pull/1224>`_: Update pre-commit hook pre-commit/mirrors-clang-format to v20.1.8 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1226 <https://github.com/numba/llvmlite/pull/1226>`_: [WIP] LLVM 20 llvmdev recipe (`gmarkall <https://github.com/gmarkall>`_ `swap357 <https://github.com/swap357>`_ `esc <https://github.com/esc>`_)
+* PR `#1227 <https://github.com/numba/llvmlite/pull/1227>`_: fix llvmdev_build.yml to resolve toolchain incompatibility on osx-64 (`swap357 <https://github.com/swap357>`_)
+* PR `#1228 <https://github.com/numba/llvmlite/pull/1228>`_: Update conda-incubator/setup-miniconda action to v3.2.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1231 <https://github.com/numba/llvmlite/pull/1231>`_: azure-pipelines/win-2019 to 2025 (`swap357 <https://github.com/swap357>`_)
+* PR `#1232 <https://github.com/numba/llvmlite/pull/1232>`_: gha/llvmdev upgrade win-2019 to 2025 (`swap357 <https://github.com/swap357>`_)
+* PR `#1233 <https://github.com/numba/llvmlite/pull/1233>`_: gha/llvmlite upgrade win-2019 to 2025 (`swap357 <https://github.com/swap357>`_)
+* PR `#1235 <https://github.com/numba/llvmlite/pull/1235>`_: Update pre-commit hook PyCQA/flake8 to v7.3.0 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1236 <https://github.com/numba/llvmlite/pull/1236>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.33.1 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1238 <https://github.com/numba/llvmlite/pull/1238>`_: gha/restructure llvmdev ci (`swap357 <https://github.com/swap357>`_)
+* PR `#1239 <https://github.com/numba/llvmlite/pull/1239>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.33.2 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1240 <https://github.com/numba/llvmlite/pull/1240>`_: pin compilers on llvmlite and llvmdev conda_build_config.yaml (`swap357 <https://github.com/swap357>`_)
+* PR `#1241 <https://github.com/numba/llvmlite/pull/1241>`_: gha/llvmlite wheel workflow fixes (`swap357 <https://github.com/swap357>`_)
+* PR `#1242 <https://github.com/numba/llvmlite/pull/1242>`_: gha/unify llvmlite conda builder workflows (`swap357 <https://github.com/swap357>`_)
+* PR `#1245 <https://github.com/numba/llvmlite/pull/1245>`_: set CONDA_PLUGINS_AUTO_ACCEPT_TOS to manylinux env setup script (`swap357 <https://github.com/swap357>`_)
+* PR `#1246 <https://github.com/numba/llvmlite/pull/1246>`_: gha/fix artifact usage manylinux wheels (`swap357 <https://github.com/swap357>`_)
+* PR `#1248 <https://github.com/numba/llvmlite/pull/1248>`_: Update actions/download-artifact action to v5 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1249 <https://github.com/numba/llvmlite/pull/1249>`_: gha/update PR path triggers to include conda recipes (`swap357 <https://github.com/swap357>`_)
+* PR `#1250 <https://github.com/numba/llvmlite/pull/1250>`_: Fix pass timing logic to stop printing to stdout. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1251 <https://github.com/numba/llvmlite/pull/1251>`_: Fix various C++ issues and a linkage issue. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1252 <https://github.com/numba/llvmlite/pull/1252>`_: Move llvmlite to solely CMake based build system.  (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1253 <https://github.com/numba/llvmlite/pull/1253>`_: Update pre-commit hook pre-commit/pre-commit-hooks to v6 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1256 <https://github.com/numba/llvmlite/pull/1256>`_: Update actions/checkout action to v5 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1257 <https://github.com/numba/llvmlite/pull/1257>`_: remove code climate integration (`esc <https://github.com/esc>`_)
+* PR `#1258 <https://github.com/numba/llvmlite/pull/1258>`_: Update pre-commit hook python-jsonschema/check-jsonschema to v0.33.3 (`renovate[bot] <https://github.com/apps/renovate>`_)
+* PR `#1259 <https://github.com/numba/llvmlite/pull/1259>`_: update osx-64 sdk on recipes and CI scripts to use MacOSX10.15 SDK (`swap357 <https://github.com/swap357>`_)
+* PR `#1260 <https://github.com/numba/llvmlite/pull/1260>`_: llvmdev 20 build patches (`swap357 <https://github.com/swap357>`_)
+* PR `#1262 <https://github.com/numba/llvmlite/pull/1262>`_: llvmdev-20 recipe fixes (`swap357 <https://github.com/swap357>`_)
+* PR `#1266 <https://github.com/numba/llvmlite/pull/1266>`_: update compatability matrix in the `README.rst` to reflect LLVM 20 (`esc <https://github.com/esc>`_)
+* PR `#1267 <https://github.com/numba/llvmlite/pull/1267>`_: adding llvm20 docs (`esc <https://github.com/esc>`_)
+* PR `#1268 <https://github.com/numba/llvmlite/pull/1268>`_: Release 0.45: `CHANGE_LOG` (`esc <https://github.com/esc>`_)
+* PR `#1269 <https://github.com/numba/llvmlite/pull/1269>`_: add sdist build and upload steps on wheel workflow (`swap357 <https://github.com/swap357>`_)
+* PR `#1274 <https://github.com/numba/llvmlite/pull/1274>`_: GHA/ standardize job names on workflows for linux builds (`swap357 <https://github.com/swap357>`_)
+* PR `#1276 <https://github.com/numba/llvmlite/pull/1276>`_: Fix build-string on llvmdev_for_wheels conda recipe (`swap357 <https://github.com/swap357>`_)
+* PR `#1278 <https://github.com/numba/llvmlite/pull/1278>`_: Update deprecation page (`sklam <https://github.com/sklam>`_)
+* PR `#1287 <https://github.com/numba/llvmlite/pull/1287>`_: change-log for 0.45.0 FINAL (`esc <https://github.com/esc>`_)
+* PR `#1289 <https://github.com/numba/llvmlite/pull/1289>`_: use explicit channel specification for llvmdev=20 installation (`swap357 <https://github.com/swap357>`_ `esc <https://github.com/esc>`_)
+
+Authors:
+
+* `alexander-shaposhnikov <https://github.com/alexander-shaposhnikov>`_
+* `dbast <https://github.com/dbast>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `HighW4y2H3ll <https://github.com/HighW4y2H3ll>`_
+* `jiel-nv <https://github.com/jiel-nv>`_
+* `kc611 <https://github.com/kc611>`_
+* `renovate[bot] <https://github.com/apps/renovate>`_
+* `rj-jesus <https://github.com/rj-jesus>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+* `swap357 <https://github.com/swap357>`_
+* `yashssh <https://github.com/yashssh>`_
+
+v0.44.0 (16 January, 2025)
+--------------------------
+
+Highlights of this release are:
+
+- Official support for Python 3.13.
+- Dropped official support for Python 3.9, the minimum supported Python version is 3.10.
+- LLVM 15 is now the default LLVM.
+- Added support for LLVM's new PassManager.
+- Support for LLVM based target triple partitioning.
+- ``llvmlite.binding.TypeRef`` now roundtrips back into ``llvmlite.ir.Type``.
+- API updates to accommodate packed Literal Structs.
+- Added NetBSD support.
+- Support for opaque pointers.
+
+Pull-Requests:
+
+* PR `#1036 <https://github.com/numba/llvmlite/pull/1036>`_: LLVM 15 conda recipe (`sklam <https://github.com/sklam>`_ `gmarkall <https://github.com/gmarkall>`_)
+* PR `#1046 <https://github.com/numba/llvmlite/pull/1046>`_: Add basic infra required to move Numba to NewPassManager (`yashssh <https://github.com/yashssh>`_ `gmarkall <https://github.com/gmarkall>`_)
+* PR `#1050 <https://github.com/numba/llvmlite/pull/1050>`_: Add conda-forge pre-tag testing to release checklist (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1051 <https://github.com/numba/llvmlite/pull/1051>`_: Roundtrip llvmlite.binding.TypeRef back into llvmlite.ir.Type (`sklam <https://github.com/sklam>`_)
+* PR `#1053 <https://github.com/numba/llvmlite/pull/1053>`_: Use RTD for all docs CI / testing (was: Try and get CI to use a newer Sphinx) (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1057 <https://github.com/numba/llvmlite/pull/1057>`_: Port refprune pass to NewPassManager (`yashssh <https://github.com/yashssh>`_)
+* PR `#1060 <https://github.com/numba/llvmlite/pull/1060>`_: port changelog for 0.43.0 to main (`esc <https://github.com/esc>`_)
+* PR `#1063 <https://github.com/numba/llvmlite/pull/1063>`_: Added llvm based process triple partitioning (`kc611 <https://github.com/kc611>`_)
+* PR `#1064 <https://github.com/numba/llvmlite/pull/1064>`_: Add support for opaque pointers (`gmarkall <https://github.com/gmarkall>`_ `rj-jesus <https://github.com/rj-jesus>`_)
+* PR `#1066 <https://github.com/numba/llvmlite/pull/1066>`_: Move Azure to use macos-12 (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1067 <https://github.com/numba/llvmlite/pull/1067>`_: Use LLVM 15 by default, add experimental LLVM 16 support (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1068 <https://github.com/numba/llvmlite/pull/1068>`_: Early exit from fpm.run() if called on function declarations (`yashssh <https://github.com/yashssh>`_)
+* PR `#1069 <https://github.com/numba/llvmlite/pull/1069>`_: Add instrumentation callback hook for new pass managers (`yashssh <https://github.com/yashssh>`_)
+* PR `#1073 <https://github.com/numba/llvmlite/pull/1073>`_: bump compiler for linux-aarch64 to 11 (`esc <https://github.com/esc>`_)
+* PR `#1077 <https://github.com/numba/llvmlite/pull/1077>`_: Add NetBSD support. (`0-wiz-0 <https://github.com/0-wiz-0>`_)
+* PR `#1080 <https://github.com/numba/llvmlite/pull/1080>`_: Added Python 3.13 to CI and Descriptions (`kc611 <https://github.com/kc611>`_)
+* PR `#1081 <https://github.com/numba/llvmlite/pull/1081>`_: Add convenience func and args (`thomaspinckney3 <https://github.com/thomaspinckney3>`_)
+* PR `#1085 <https://github.com/numba/llvmlite/pull/1085>`_: Fix RTD build, no need for get_html_theme_path(). (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1087 <https://github.com/numba/llvmlite/pull/1087>`_: Add missing argtypes description for refprune pass related APIs (`yashssh <https://github.com/yashssh>`_)
+* PR `#1090 <https://github.com/numba/llvmlite/pull/1090>`_: Add MSVC `-GL` workaround (`sklam <https://github.com/sklam>`_)
+* PR `#1094 <https://github.com/numba/llvmlite/pull/1094>`_: Fix CI by not removing nonexistent environment (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1097 <https://github.com/numba/llvmlite/pull/1097>`_: update azure-pipelines to macos-13 (`swap357 <https://github.com/swap357>`_)
+* PR `#1098 <https://github.com/numba/llvmlite/pull/1098>`_: Fix store to opaque ptr (`alexander-shaposhnikov <https://github.com/alexander-shaposhnikov>`_)
+* PR `#1104 <https://github.com/numba/llvmlite/pull/1104>`_: Target 0.44.0: Fix osx wheel build (`sklam <https://github.com/sklam>`_)
+* PR `#1108 <https://github.com/numba/llvmlite/pull/1108>`_: Fix Windows llvmdev build due to zlib linkage (`sklam <https://github.com/sklam>`_)
+
+Authors:
+
+* `0-wiz-0 <https://github.com/0-wiz-0>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `kc611 <https://github.com/kc611>`_
+* `rj-jesus <https://github.com/rj-jesus>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+* `thomaspinckney3 <https://github.com/thomaspinckney3>`_
+* `yashssh <https://github.com/yashssh>`_
+* `alexander-shaposhnikov <https://github.com/alexander-shaposhnikov>`_
+* `swap357 <https://github.com/swap357>`_
+
+v0.43.0 (June 13, 2024)
+-----------------------
+
+Highlights of this release are:
+
+- Support for building against LLVM 15.
+- A fix for `refpruning` algorithm in specific `fanout_raise` cases.
+
+Pull-Requests:
+
+* PR `#1025 <https://github.com/numba/llvmlite/pull/1025>`_: skip `raise` basic blocks in `verifyFanoutBackward` (`dlee992 <https://github.com/dlee992>`_)
+* PR `#1029 <https://github.com/numba/llvmlite/pull/1029>`_: Update CHANGE_LOG for 0.42.0 final. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#1032 <https://github.com/numba/llvmlite/pull/1032>`_: v0.42 Post release  (`sklam <https://github.com/sklam>`_)
+* PR `#1035 <https://github.com/numba/llvmlite/pull/1035>`_:  Support building against llvm15 (`gmarkall <https://github.com/gmarkall>`_ `yashssh <https://github.com/yashssh>`_)
+* PR `#1059 <https://github.com/numba/llvmlite/pull/1059>`_: update CHANGE_LOG and release date for 0.43.0 final (`esc <https://github.com/esc>`_)
+
+Authors:
+
+* `dlee992 <https://github.com/dlee992>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+* `yashssh <https://github.com/yashssh>`_
+
+v0.42.0 (January 31, 2024)
+--------------------------
+
+Highlights of this release include:
+
+- Support for Python 3.12.
+- A fix for relocation overflows on AArch64 systems.
+- Binding layer: new queries for incoming blocks of phi instructions, type
+  kinds, and elements. Addition of the Instruction Namer pass.
+- IR layer: Support `convergent` as an attribute of function calls and call
+  instructions.
+
+Pull-Requests:
+
+* PR `#973 <https://github.com/numba/llvmlite/pull/973>`_: Bindings: Query incoming blocks of a phi instruction (`tbennun <https://github.com/tbennun>`_)
+* PR `#978 <https://github.com/numba/llvmlite/pull/978>`_: Bindings: Query type kinds, derived types, and elements (`tbennun <https://github.com/tbennun>`_ `sklam <https://github.com/sklam>`_)
+* PR `#981 <https://github.com/numba/llvmlite/pull/981>`_: Add Instruction Namer pass to PassManager (`tbennun <https://github.com/tbennun>`_)
+* PR `#993 <https://github.com/numba/llvmlite/pull/993>`_: Update changelog on main for 0.41.0 (`esc <https://github.com/esc>`_)
+* PR `#1005 <https://github.com/numba/llvmlite/pull/1005>`_: Remove suggestion that add_global_mapping() is unused (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1006 <https://github.com/numba/llvmlite/pull/1006>`_: Release Notes 0.41.1 for main (`esc <https://github.com/esc>`_)
+* PR `#1007 <https://github.com/numba/llvmlite/pull/1007>`_: update release checklists post 0.41.1 (`esc <https://github.com/esc>`_)
+* PR `#1009 <https://github.com/numba/llvmlite/pull/1009>`_: Fix relocation overflows by implementing preallocation in the memory manager (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#1010 <https://github.com/numba/llvmlite/pull/1010>`_: Python 3.12 (`esc <https://github.com/esc>`_)
+* PR `#1012 <https://github.com/numba/llvmlite/pull/1012>`_: conda-recipe cleanups (`esc <https://github.com/esc>`_)
+* PR `#1014 <https://github.com/numba/llvmlite/pull/1014>`_: Fix conda-recipe syntax errors from #1012 (`esc <https://github.com/esc>`_)
+* PR `#1017 <https://github.com/numba/llvmlite/pull/1017>`_: add 3.12 to azure (`esc <https://github.com/esc>`_)
+* PR `#1018 <https://github.com/numba/llvmlite/pull/1018>`_: Bump minimum supported Python version to 3.9 (`kc611 <https://github.com/kc611>`_)
+* PR `#1019 <https://github.com/numba/llvmlite/pull/1019>`_: Add convergent as a supported FunctionAttribute and CallInstrAttribute. (`diptorupd <https://github.com/diptorupd>`_)
+
+Authors:
+
+* `diptorupd <https://github.com/diptorupd>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `kc611 <https://github.com/kc611>`_
+* `sklam <https://github.com/sklam>`_
+* `tbennun <https://github.com/tbennun>`_
+
+v0.41.1 (October 17, 2023)
+--------------------------
+
+This is a maintenance release that includes a workaround in the test suite for
+ORCJit issues on the ``aarch64`` platform. Also, this is the last release to
+support the Windows 32-bit platform (``win32``).
+
+Pull-Requests:
+
+* PR `#996 <https://github.com/numba/llvmlite/pull/996>`_: fix typos found by codespell (`esc <https://github.com/esc>`_)
+* PR `#997 <https://github.com/numba/llvmlite/pull/997>`_: Fix issue #880 by ensuring all sources are compiled under FreeBSD. (`ke6jjj <https://github.com/ke6jjj>`_)
+* PR `#998 <https://github.com/numba/llvmlite/pull/998>`_: adding sphinx_rtd_theme to RTD build to fix build (`esc <https://github.com/esc>`_)
+* PR `#1001 <https://github.com/numba/llvmlite/pull/1001>`_: Fix / workaround for OrcJIT blocking issues (`gmarkall <https://github.com/gmarkall>`_)
+
+Authors:
+
+* `esc <https://github.com/esc>`_
+* `ke6jjj <https://github.com/ke6jjj>`_
+* `gmarkall <https://github.com/gmarkall>`_
+
+v0.41.0 (September 20, 2023)
+----------------------------
+
+Pull-Requests:
+
+* PR `#871 <https://github.com/numba/llvmlite/pull/871>`_: Refactor native library loading (`folded <https://github.com/folded>`_ `sklam <https://github.com/sklam>`_)
+* PR `#896 <https://github.com/numba/llvmlite/pull/896>`_: drop upper limit on Python for conda recipe (`esc <https://github.com/esc>`_)
+* PR `#904 <https://github.com/numba/llvmlite/pull/904>`_: Create GitHub Action for llvmlite release (`apmasell <https://github.com/apmasell>`_)
+* PR `#934 <https://github.com/numba/llvmlite/pull/934>`_: Expose TargetLibraryInfo pass (`sklam <https://github.com/sklam>`_)
+* PR `#935 <https://github.com/numba/llvmlite/pull/935>`_: Disable zlib for LLVM on Windows (`apmasell <https://github.com/apmasell>`_)
+* PR `#936 <https://github.com/numba/llvmlite/pull/936>`_: Enable querying constants and value kinds (`tbennun <https://github.com/tbennun>`_)
+* PR `#939 <https://github.com/numba/llvmlite/pull/939>`_: Bump llvmdev build number to include the nozlib change for windows (`sklam <https://github.com/sklam>`_)
+* PR `#940 <https://github.com/numba/llvmlite/pull/940>`_: Update CHANGE_LOG for 0.40.0 final. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#942 <https://github.com/numba/llvmlite/pull/942>`_: Add ORCJITv2 support (`apmasell <https://github.com/apmasell>`_)
+* PR `#951 <https://github.com/numba/llvmlite/pull/951>`_: Add a type hint for `IntType.width` (`apmasell <https://github.com/apmasell>`_)
+* PR `#952 <https://github.com/numba/llvmlite/pull/952>`_: Fix CI failing due to unsupported target triple on non-x86 platforms. (`sklam <https://github.com/sklam>`_)
+* PR `#958 <https://github.com/numba/llvmlite/pull/958>`_: fixup LLVM versions in version compat table (`esc <https://github.com/esc>`_)
+* PR `#959 <https://github.com/numba/llvmlite/pull/959>`_: Remove support for LLVM < 14 (`apmasell <https://github.com/apmasell>`_)
+* PR `#960 <https://github.com/numba/llvmlite/pull/960>`_: add various bullets to release checklists and sync (`esc <https://github.com/esc>`_)
+* PR `#963 <https://github.com/numba/llvmlite/pull/963>`_: Allow adding comments to generated IR (`apmasell <https://github.com/apmasell>`_)
+* PR `#966 <https://github.com/numba/llvmlite/pull/966>`_: build: support building on GNU/Hurd (`pinotree <https://github.com/pinotree>`_)
+* PR `#967 <https://github.com/numba/llvmlite/pull/967>`_: Expose library name in OrcJIT tracker (`apmasell <https://github.com/apmasell>`_)
+* PR `#968 <https://github.com/numba/llvmlite/pull/968>`_: Update LLVM manual build instructions (`apmasell <https://github.com/apmasell>`_)
+* PR `#969 <https://github.com/numba/llvmlite/pull/969>`_: update changelog on main for v0.40.1 (`esc <https://github.com/esc>`_)
+* PR `#983 <https://github.com/numba/llvmlite/pull/983>`_: adding RTD conf file V2 as per request (`esc <https://github.com/esc>`_)
+* PR `#985 <https://github.com/numba/llvmlite/pull/985>`_: Update release checklist post 0.41.0rc1 (`esc <https://github.com/esc>`_)
+* PR `#988 <https://github.com/numba/llvmlite/pull/988>`_: Fix FreeBsd build (`sklam <https://github.com/sklam>`_)
+
+Authors:
+
+* `apmasell <https://github.com/apmasell>`_
+* `esc <https://github.com/esc>`_
+* `folded <https://github.com/folded>`_
+* `pinotree <https://github.com/pinotree>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+* `tbennun <https://github.com/tbennun>`_
+
+v0.40.1 (June 21, 2023)
+-----------------------
+
+Pull-Requests:
+
+* PR `#945 <https://github.com/numba/llvmlite/pull/945>`_: Fix #944. Add `.argtypes` to prevent errors in pypy. (`Siu Kwan Lam <https://github.com/sklam>`_)
+* PR `#947 <https://github.com/numba/llvmlite/pull/947>`_: Update SVML patch for LLVM 14 (`Andre Masella <https://github.com/apmasell>`_)
+* PR `#949 <https://github.com/numba/llvmlite/pull/949>`_: Handle PowerPC synonyms (`Andre Masella <https://github.com/apmasell>`_)
+* PR `#950 <https://github.com/numba/llvmlite/pull/950>`_: Fix incorrect `byval` and other attributes on LLVM 14 (`Andre Masella <https://github.com/apmasell>`_)
+
+Authors:
+
+* `Andre Masella <https://github.com/apmasell>`_
+* `Siu Kwan Lam <https://github.com/sklam>`_
+
+
+v0.40.0 (May 1, 2023)
+---------------------
+
+This release predominantly upgrades to LLVM 14 and Python 3.11.
+Bindings to a large number of passes are added.
+The minimum supported Python version is now Python 3.8.
+
+Note: A bug was discovered in LLVM's RuntimeDyldELF on the Aarch64 platform that
+can cause segfaults when cross module symbols are linked. It is necessary
+for JIT users to build LLVM with the patch added in 
+`PR#926 <https://github.com/numba/llvmlite/pull/926>`_.
+
+Pull-Requests:
+
+* PR `#827 <https://github.com/numba/llvmlite/pull/827>`_: Add more LLVM pass bindings (`apmasell <https://github.com/apmasell>`_)
+* PR `#830 <https://github.com/numba/llvmlite/pull/830>`_: Add LLVM 14 support (`apmasell <https://github.com/apmasell>`_)
+* PR `#860 <https://github.com/numba/llvmlite/pull/860>`_: the git tag for the RC needs an rc1 suffix (`esc <https://github.com/esc>`_)
+* PR `#869 <https://github.com/numba/llvmlite/pull/869>`_: bump max Python version to 3.11 (`esc <https://github.com/esc>`_ `sklam <https://github.com/sklam>`_)
+
+* PR `#876 <https://github.com/numba/llvmlite/pull/876>`_: Remove ``llvmlite.llvmpy`` after deprecation (`apmasell <https://github.com/apmasell>`_)
+* PR `#883 <https://github.com/numba/llvmlite/pull/883>`_: Adds support for calling functions with 'tail', 'notail', or 'musttail' markers. (`bslatkin <https://github.com/bslatkin>`_)
+* PR `#886 <https://github.com/numba/llvmlite/pull/886>`_: Simplify setup.py Python version guard (`mbargull <https://github.com/mbargull>`_)
+* PR `#892 <https://github.com/numba/llvmlite/pull/892>`_: Bump minimum supported Python version to 3.8 (`jamesobutler <https://github.com/jamesobutler>`_)
+* PR `#893 <https://github.com/numba/llvmlite/pull/893>`_: Upgrade to ubuntu-20.04 for azure pipeline CI (`jamesobutler <https://github.com/jamesobutler>`_)
+* PR `#899 <https://github.com/numba/llvmlite/pull/899>`_: Run Minconda install with bash (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#903 <https://github.com/numba/llvmlite/pull/903>`_: Fix flake8 config and style for flake8 6 (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#905 <https://github.com/numba/llvmlite/pull/905>`_: Add YouCompleteMe configuration file and ignore vim swap files (`gmarkall <https://github.com/gmarkall>`_)
+* PR `#906 <https://github.com/numba/llvmlite/pull/906>`_: Replace importlib-resources legacy API use (`sklam <https://github.com/sklam>`_)
+* PR `#910 <https://github.com/numba/llvmlite/pull/910>`_: Aarch64 split build for LLVM14 (`sklam <https://github.com/sklam>`_)
+* PR `#921 <https://github.com/numba/llvmlite/pull/921>`_: Setup AzureCI to use py311 and llvm14  (`sklam <https://github.com/sklam>`_)
+* PR `#922 <https://github.com/numba/llvmlite/pull/922>`_: Fix AzureCI not using llvm14 on windows (`sklam <https://github.com/sklam>`_)
+* PR `#926 <https://github.com/numba/llvmlite/pull/926>`_: llvmdev recipe: Add patch that clears GOTOffsetMap (`apmasell <https://github.com/apmasell>`_ `gmarkall <https://github.com/gmarkall>`_ `sklam <https://github.com/sklam>`_)
+* PR `#930 <https://github.com/numba/llvmlite/pull/930>`_: Update changelog for 0.40.0rc1  (`sklam <https://github.com/sklam>`_ `stuartarchibald <https://github.com/stuartarchibald>`_)
+* PR `#931 <https://github.com/numba/llvmlite/pull/931>`_: Remove maximum Python version limit (`sklam <https://github.com/sklam>`_ `apmasell <https://github.com/apmasell>`_)
+* PR `#932 <https://github.com/numba/llvmlite/pull/932>`_: Fix wheel builds (`sklam <https://github.com/sklam>`_)
+* PR `#935 <https://github.com/numba/llvmlite/pull/935>`_: Disable zlib for LLVM on Windows (`apmasell <https://github.com/apmasell>`_)
+* PR `#939 <https://github.com/numba/llvmlite/pull/939>`_: Bump llvmdev build number to include the nozlib change for windows (`sklam <https://github.com/sklam>`_)
+* PR `#940 <https://github.com/numba/llvmlite/pull/940>`_: Update CHANGE_LOG for 0.40.0 final. (`stuartarchibald <https://github.com/stuartarchibald>`_)
+
+Authors:
+
+* `apmasell <https://github.com/apmasell>`_
+* `bslatkin <https://github.com/bslatkin>`_
+* `esc <https://github.com/esc>`_
+* `gmarkall <https://github.com/gmarkall>`_
+* `jamesobutler <https://github.com/jamesobutler>`_
+* `mbargull <https://github.com/mbargull>`_
+* `sklam <https://github.com/sklam>`_
+* `stuartarchibald <https://github.com/stuartarchibald>`_
+
 v0.39.1 (September 1, 2022)
 ---------------------------
 

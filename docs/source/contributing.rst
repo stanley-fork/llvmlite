@@ -78,24 +78,11 @@ Coding conventions
   for maximum readability with all existing tools, such as code
   review user interfaces.
 
-Optionally, you may wish to setup `pre-commit hooks <https://pre-commit.com/>`_
-to automatically run ``clang-format`` when you make a git commit. This can be
-done by installing ``pre-commit``::
-
-    pip install pre-commit
-
-and then running::
-
-    pre-commit install
-
-from the root of the Numba repository. Now ``clang-format`` will be run each time
-you commit changes. You can skip this check with ``git commit --no-verify``.
-
 
 Platform support
 ----------------
 
-Llvmlite will be kept compatible with Python 3.8 and later
+Llvmlite will be kept compatible with Python 3.10 and later
 under at least Windows, macOS and Linux.
 
 We do not expect contributors to test their code on all platforms.  Pull

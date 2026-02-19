@@ -38,10 +38,16 @@ instantiated, a type should be considered immutable.
         to the *target_data*---an
         :class:`llvmlite.binding.TargetData` instance.
 
-        NOTE: :meth:`get_abi_size` and :meth:`get_abi_alignment`
-        call into the LLVM C++ API to get the requested
-        information.
+   * .. method:: get_element_offset(target_data, position)
 
+        Get the byte offset for the struct element at *position*,
+        according to the *target_data*---an
+        :class:`llvmlite.binding.TargetData` instance.
+
+        NOTE: :meth:`get_abi_size`, :meth:`get_abi_alignment`,
+        and :meth:`get_element_offset` call into the LLVM C++
+        API to get the requested information.
+        
    * .. method:: __call__(value)
 
         A convenience method to create a :class:`Constant` of
@@ -57,22 +63,6 @@ instantiated, a type should be considered immutable.
 
 Atomic types
 =============
-
-.. class:: PointerType(pointee, addrspace=0)
-
-   The type of pointers to another type.
-
-   Pointer types expose the following attributes:
-
-   * .. attribute:: addrspace
-
-        The pointer's address space number. This optional integer
-        allows you to choose a non-default address space---the
-        meaning is platform dependent.
-
-   * .. attribute:: pointee
-
-        The type pointed to.
 
 
 .. class:: IntType(bits)
@@ -103,6 +93,70 @@ Atomic types
 
    The class for void types. Used only as the return type of a
    function without a return value.
+
+
+.. _pointer-types:
+
+Pointer Types
+=============
+
+The IR layer presently supports both *Typed Pointers* and *Opaque Pointers*.
+Support for Typed Pointers will eventually be removed.
+
+.. note::
+   Further details of the migration to Opaque Pointers are outlined in the
+   section on :ref:`deprecation-of-typed-pointers`.
+
+Typed Pointers are created using:
+
+.. class:: PointerType(pointee, addrspace=0)
+
+   The type of pointers to another type.
+
+   Pointer types expose the following attributes:
+
+   * .. attribute:: addrspace
+
+        The pointer's address space number. This optional integer
+        allows you to choose a non-default address space---the
+        meaning is platform dependent.
+
+   * .. attribute:: pointee
+
+        The type pointed to.
+
+Printing of Typed Pointers as Opaque Pointers can be enabled by setting the
+environment variable:
+
+.. code:: bash
+
+   LLVMLITE_ENABLE_IR_LAYER_TYPED_POINTERS=0
+
+or by setting the ``ir_layer_typed_pointers_enabled`` attribute after importing
+llvmlite, but prior to using any of its functionality. For example:
+
+.. code:: python
+
+   import llvmlite
+   llvmlite.ir_layer_typed_pointers_enabled = False
+
+   # ... continue using llvmlite ...
+
+Opaque Pointers can be created by using:
+
+.. class:: PointerType(addrspace=0)
+   :noindex:
+
+   The type of pointers.
+
+   Pointer types expose the following attribute:
+
+   * .. attribute:: addrspace
+        :noindex:
+
+        The pointer's address space number. This optional integer
+        allows you to choose a non-default address space---the
+        meaning is platform dependent.
 
 
 .. _aggregate-types:

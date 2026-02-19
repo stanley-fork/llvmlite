@@ -1,9 +1,10 @@
 import unittest
+from collections import defaultdict
 from llvmlite import ir
 from llvmlite import binding as llvm
 from llvmlite.tests import TestCase
 
-from . import refprune_proto as proto
+import llvmlite.tests.refprune_proto as proto
 
 
 def _iterate_cases(generate_test):
@@ -16,6 +17,15 @@ def _iterate_cases(generate_test):
     for k, case_fn in proto.__dict__.items():
         if k.startswith('case'):
             yield f'test_{k}', wrap(case_fn)
+
+
+class PassManagerMixin():
+
+    def pb(self):
+        llvm.initialize_native_target()
+        tm = llvm.Target.from_default_triple().create_target_machine()
+        pto = llvm.create_pipeline_tuning_options(speed_level=0, size_level=0)
+        return llvm.create_pass_builder(tm, pto)
 
 
 class TestRefPrunePrototype(TestCase):
@@ -35,7 +45,7 @@ class TestRefPrunePrototype(TestCase):
 ptr_ty = ir.IntType(8).as_pointer()
 
 
-class TestRefPrunePass(TestCase):
+class TestRefPrunePass(TestCase, PassManagerMixin):
     """
     Test that the C++ implementation matches the expected behavior as for
     the prototype.
@@ -116,14 +126,19 @@ class TestRefPrunePass(TestCase):
 
     def apply_refprune(self, irmod):
         mod = llvm.parse_assembly(str(irmod))
-        pm = llvm.ModulePassManager()
+        pb = self.pb()
+        pm = pb.getModulePassManager()
         pm.add_refprune_pass()
-        pm.run(mod)
+        pm.run(mod, pb)
         return mod
 
     def check(self, mod, expected, nodes):
         # preprocess incref/decref locations
-        d = {}
+
+        # LLVM >= 18 adds an extra empty block "LoopExit" which causes
+        # regular dict to throw KeyError
+        d = defaultdict(lambda: defaultdict(int))
+
         for k, vs in nodes.items():
             n_incref = vs.count('incref')
             n_decref = vs.count('decref')
@@ -138,6 +153,7 @@ class TestRefPrunePass(TestCase):
         for f in mod.functions:
             if f.name == 'main':
                 break
+
         # check each BB
         for bb in f.blocks:
             stats = d[bb.name]
@@ -158,7 +174,7 @@ class TestRefPrunePass(TestCase):
         locals()[name] = case
 
 
-class BaseTestByIR(TestCase):
+class BaseTestByIR(TestCase, PassManagerMixin):
     refprune_bitmask = 0
 
     prologue = r"""
@@ -168,14 +184,15 @@ declare void @NRT_decref(i8* %ptr)
 
     def check(self, irmod, subgraph_limit=None):
         mod = llvm.parse_assembly(f"{self.prologue}\n{irmod}")
-        pm = llvm.ModulePassManager()
+        pb = self.pb()
+        pm = pb.getModulePassManager()
         if subgraph_limit is None:
             pm.add_refprune_pass(self.refprune_bitmask)
         else:
             pm.add_refprune_pass(self.refprune_bitmask,
                                  subgraph_limit=subgraph_limit)
         before = llvm.dump_refprune_stats()
-        pm.run(mod)
+        pm.run(mod, pb)
         after = llvm.dump_refprune_stats()
         return mod, after - before
 
@@ -210,14 +227,14 @@ define void @main(i8* %ptr) {
         mod, stats = self.check(self.per_bb_ir_2)
         self.assertEqual(stats.basicblock, 4)
         # not pruned
-        self.assertIn("call void @NRT_incref(i8* %ptr)", str(mod))
+        self.assertIn("call void @NRT_incref(ptr %ptr)", str(mod))
 
     per_bb_ir_3 = r"""
-define void @main(i8* %ptr, i8* %other) {
-    call void @NRT_incref(i8* %ptr)
-    call void @NRT_incref(i8* %ptr)
-    call void @NRT_decref(i8* %ptr)
-    call void @NRT_decref(i8* %other)
+define void @main(ptr %ptr, ptr %other) {
+    call void @NRT_incref(ptr %ptr)
+    call void @NRT_incref(ptr %ptr)
+    call void @NRT_decref(ptr %ptr)
+    call void @NRT_decref(ptr %other)
     ret void
 }
 """
@@ -226,16 +243,16 @@ define void @main(i8* %ptr, i8* %other) {
         mod, stats = self.check(self.per_bb_ir_3)
         self.assertEqual(stats.basicblock, 2)
         # not pruned
-        self.assertIn("call void @NRT_decref(i8* %other)", str(mod))
+        self.assertIn("call void @NRT_decref(ptr %other)", str(mod))
 
     per_bb_ir_4 = r"""
 ; reordered
-define void @main(i8* %ptr, i8* %other) {
-    call void @NRT_incref(i8* %ptr)
-    call void @NRT_decref(i8* %ptr)
-    call void @NRT_decref(i8* %ptr)
-    call void @NRT_decref(i8* %other)
-    call void @NRT_incref(i8* %ptr)
+define void @main(ptr %ptr, ptr %other) {
+    call void @NRT_incref(ptr %ptr)
+    call void @NRT_decref(ptr %ptr)
+    call void @NRT_decref(ptr %ptr)
+    call void @NRT_decref(ptr %other)
+    call void @NRT_incref(ptr %ptr)
     ret void
 }
 """
@@ -244,7 +261,7 @@ define void @main(i8* %ptr, i8* %other) {
         mod, stats = self.check(self.per_bb_ir_4)
         self.assertEqual(stats.basicblock, 4)
         # not pruned
-        self.assertIn("call void @NRT_decref(i8* %other)", str(mod))
+        self.assertIn("call void @NRT_decref(ptr %other)", str(mod))
 
 
 class TestDiamond(BaseTestByIR):
@@ -371,7 +388,7 @@ bb_C:
         self.assertEqual(stats.fanout, 3)
 
     fanout_2 = r"""
-define void @main(i8* %ptr, i1 %cond) {
+define void @main(i8* %ptr, i1 %cond, i8** %excinfo) {
 bb_A:
     call void @NRT_incref(i8* %ptr)
     br i1 %cond, label %bb_B, label %bb_C
@@ -421,7 +438,7 @@ class TestFanoutRaise(BaseTestByIR):
     refprune_bitmask = llvm.RefPruneSubpasses.FANOUT_RAISE
 
     fanout_raise_1 = r"""
-define i32 @main(i8* %ptr, i1 %cond) {
+define i32 @main(i8* %ptr, i1 %cond, i8** %excinfo) {
 bb_A:
     call void @NRT_incref(i8* %ptr)
     br i1 %cond, label %bb_B, label %bb_C
@@ -429,9 +446,9 @@ bb_B:
     call void @NRT_decref(i8* %ptr)
     ret i32 0
 bb_C:
-    ret i32 1, !ret_is_raise !0
+    store i8* null, i8** %excinfo, !numba_exception_output !0
+    ret i32 1
 }
-
 !0 = !{i1 true}
 """
 
@@ -440,7 +457,7 @@ bb_C:
         self.assertEqual(stats.fanout_raise, 2)
 
     fanout_raise_2 = r"""
-define i32 @main(i8* %ptr, i1 %cond) {
+define i32 @main(i8* %ptr, i1 %cond, i8** %excinfo) {
 bb_A:
     call void @NRT_incref(i8* %ptr)
     br i1 %cond, label %bb_B, label %bb_C
@@ -448,18 +465,21 @@ bb_B:
     call void @NRT_decref(i8* %ptr)
     ret i32 0
 bb_C:
-    ret i32 1, !ret_is_a_raise !0           ; bad metadata
+    store i8* null, i8** %excinfo, !numba_exception_typo !0      ; bad metadata
+    ret i32 1
 }
 
 !0 = !{i1 true}
 """
 
     def test_fanout_raise_2(self):
+        # This is ensuring that fanout_raise is not pruning when the metadata
+        # is incorrectly named.
         mod, stats = self.check(self.fanout_raise_2)
         self.assertEqual(stats.fanout_raise, 0)
 
     fanout_raise_3 = r"""
-define i32 @main(i8* %ptr, i1 %cond) {
+define i32 @main(i8* %ptr, i1 %cond, i8** %excinfo) {
 bb_A:
     call void @NRT_incref(i8* %ptr)
     br i1 %cond, label %bb_B, label %bb_C
@@ -467,7 +487,8 @@ bb_B:
     call void @NRT_decref(i8* %ptr)
     ret i32 0
 bb_C:
-    ret i32 1, !ret_is_raise !0
+    store i8* null, i8** %excinfo, !numba_exception_output !0
+    ret i32 1
 }
 
 !0 = !{i32 1}       ; ok; use i32
@@ -478,22 +499,75 @@ bb_C:
         self.assertEqual(stats.fanout_raise, 2)
 
     fanout_raise_4 = r"""
-define i32 @main(i8* %ptr, i1 %cond) {
+define i32 @main(i8* %ptr, i1 %cond, i8** %excinfo) {
 bb_A:
     call void @NRT_incref(i8* %ptr)
     br i1 %cond, label %bb_B, label %bb_C
 bb_B:
-    ret i32 1, !ret_is_raise !0    ; BAD; all tails are raising without decref
+    ret i32 1    ; BAD; all tails are raising without decref
 bb_C:
-    ret i32 1, !ret_is_raise !0    ; BAD; all tails are raising without decref
+    ret i32 1    ; BAD; all tails are raising without decref
 }
 
-!0 = !{i32 1}
+!0 = !{i1 1}
 """
 
     def test_fanout_raise_4(self):
         mod, stats = self.check(self.fanout_raise_4)
         self.assertEqual(stats.fanout_raise, 0)
+
+    fanout_raise_5 = r"""
+define i32 @main(i8* %ptr, i1 %cond, i8** %excinfo) {
+bb_A:
+    call void @NRT_incref(i8* %ptr)
+    br i1 %cond, label %bb_B, label %bb_C
+bb_B:
+    call void @NRT_decref(i8* %ptr)
+    br label %common.ret
+bb_C:
+    store i8* null, i8** %excinfo, !numba_exception_output !0
+    br label %common.ret
+common.ret:
+    %common.ret.op = phi i32 [ 0, %bb_B ], [ 1, %bb_C ]
+    ret i32 %common.ret.op
+}
+!0 = !{i1 1}
+"""
+
+    def test_fanout_raise_5(self):
+        mod, stats = self.check(self.fanout_raise_5)
+        self.assertEqual(stats.fanout_raise, 2)
+
+    # test case 6 is from https://github.com/numba/llvmlite/issues/1023
+    fanout_raise_6 = r"""
+define i32 @main(i8* %ptr, i1 %cond1, i1 %cond2, i1 %cond3, i8** %excinfo) {
+bb_A:
+    call void @NRT_incref(i8* %ptr)
+    call void @NRT_incref(i8* %ptr)
+    br i1 %cond1, label %bb_B, label %bb_C
+bb_B:
+    call void @NRT_decref(i8* %ptr)
+    br i1 %cond2, label %bb_D, label %bb_E
+bb_C:
+    store i8* null, i8** %excinfo, !numba_exception_output !0
+    ret i32 1
+bb_D:
+    call void @NRT_decref(i8* %ptr)
+    ret i32 0
+bb_E:
+    call void @NRT_incref(i8* %ptr)
+    br i1 %cond3, label %bb_F, label %bb_C
+bb_F:
+    call void @NRT_decref(i8* %ptr)
+    call void @NRT_decref(i8* %ptr)
+    ret i32 0
+}
+!0 = !{i1 1}
+"""
+
+    def test_fanout_raise_6(self):
+        mod, stats = self.check(self.fanout_raise_6)
+        self.assertEqual(stats.fanout_raise, 7)
 
 
 if __name__ == '__main__':

@@ -2,6 +2,11 @@
 #define LLVMPY_CORE_H_
 
 #include "llvm-c/Core.h"
+
+// Needed for macros that control version-specific behaviour - included here so
+// that they are available in all ffi translation units
+#include "llvm/Config/llvm-config.h"
+
 #include <cstdlib>
 #include <cstring>
 
@@ -12,7 +17,8 @@
 #if defined(HAVE_DECLSPEC_DLL)
 #define API_EXPORT(RTYPE) __declspec(dllexport) RTYPE
 #else
-#define API_EXPORT(RTYPE) RTYPE
+// Non-windows: use visibility attributes.
+#define API_EXPORT(RTYPE) __attribute__((visibility("default"))) RTYPE
 #endif
 
 extern "C" {
